@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/ryanlower/drain/parser"
+	"github.com/ryanlower/drain/reporters"
 )
 
 func main() {
@@ -31,7 +32,9 @@ func drainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	parsed, err := parser.Parse(body)
-	log.Print(parsed)
+
+	// use basic logging reporter by default
+	new(reporters.Log).Report(parsed)
 
 	w.WriteHeader(http.StatusOK)
 }
