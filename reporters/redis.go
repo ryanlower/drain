@@ -1,6 +1,7 @@
 package reporters
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/garyburd/redigo/redis"
@@ -18,7 +19,12 @@ type Redis struct {
 func (r *Redis) Report(hit *parser.ParsedLogLine) {
 	conn := connect()
 
-	conn.Do("PUBLISH", "drain.statuses", hit.Status)
+	hitJSON, err := json.Marshal(hit)
+	if err != nil {
+		log.Panic(err)
+	} else {
+		conn.Do("PUBLISH", "drain.hits", hitJSON)
+	}
 }
 
 func connect() redis.Conn {
