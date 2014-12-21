@@ -33,8 +33,14 @@ func drainHandler(w http.ResponseWriter, r *http.Request) {
 
 	parsed, err := parser.Parse(body)
 
-	// use basic logging reporter by default
-	new(reporters.Log).Report(parsed)
+	report(parsed)
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func report(hit *parser.ParsedLogLine) {
+	// use Log and Redis reporters by default
+	// TODO, allow customization
+	new(reporters.Log).Report(hit)
+	new(reporters.Redis).Report(hit)
 }

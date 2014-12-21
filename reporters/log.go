@@ -7,7 +7,9 @@ import (
 )
 
 // Log is a reporter that logs via Report
-type Log struct{}
+type Log struct {
+	Reporter
+}
 
 // Report logs the parsed log line
 func (r *Log) Report(hit *parser.ParsedLogLine) {
