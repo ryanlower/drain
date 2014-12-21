@@ -33,7 +33,9 @@ func drainHandler(w http.ResponseWriter, r *http.Request) {
 
 	parsed, err := parser.Parse(body)
 
-	report(parsed)
+	if parsed != nil {
+		report(parsed)
+	}
 
 	w.WriteHeader(http.StatusOK)
 }
