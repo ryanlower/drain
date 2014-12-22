@@ -1,0 +1,5 @@
+{
+	"ImportPath": "github.com/ryanlower/drain",
+	"GoVersion": "go1.4",
+	"Deps": []
+}
