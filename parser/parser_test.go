@@ -27,6 +27,27 @@ func TestParseHost(t *testing.T) {
 	assert.Equal(t, "example.com", parsed.Host)
 }
 
+func TestParseIP(t *testing.T) {
+	body := []byte(`<321>1 2014-12-25T19:07:10.076560+00:00 host heroku router - at=info method=GET path="/test/123" host=example.com request_id=12345-abcde fwd="127.0.0.1" dyno=web.11 connect=12ms service=123ms status=200 bytes=1234`)
+
+	parsed, _ := Parse(body)
+	assert.Equal(t, "127.0.0.1", parsed.IP)
+}
+
+func TestParseConnectTime(t *testing.T) {
+	body := []byte(`<321>1 2014-12-25T19:07:10.076560+00:00 host heroku router - at=info method=GET path="/test/123" host=example.com request_id=12345-abcde fwd="127.0.0.1" dyno=web.11 connect=12ms service=123ms status=200 bytes=1234`)
+
+	parsed, _ := Parse(body)
+	assert.Equal(t, "12", parsed.ConnectTime)
+}
+
+func TestParseServiceTime(t *testing.T) {
+	body := []byte(`<321>1 2014-12-25T19:07:10.076560+00:00 host heroku router - at=info method=GET path="/test/123" host=example.com request_id=12345-abcde fwd="127.0.0.1" dyno=web.11 connect=12ms service=123ms status=200 bytes=1234`)
+
+	parsed, _ := Parse(body)
+	assert.Equal(t, "123", parsed.ServiceTime)
+}
+
 func TestParseStatus(t *testing.T) {
 	body := []byte(`<321>1 2014-12-25T19:07:10.076560+00:00 host heroku router - at=info method=GET path="/test/123" host=example.com request_id=12345-abcde fwd="127.0.0.1" dyno=web.11 connect=12ms service=123ms status=200 bytes=1234`)
 
