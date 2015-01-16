@@ -33,3 +33,11 @@ func TestParseStatus(t *testing.T) {
 	parsed, _ := Parse(body)
 	assert.Equal(t, "200", parsed.Status)
 }
+
+func TestParseError(t *testing.T) {
+	body := []byte(`something else`)
+
+	parsed, err := Parse(body)
+	assert.Nil(t, parsed)
+	assert.Equal(t, "Can't parse: body doesn't match regex", err.Error())
+}
