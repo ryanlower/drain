@@ -25,6 +25,12 @@ func main() {
 func drainHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
+	if !authenticated(r) {
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// TODO, don't break if no body
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		log.Panic(err)
@@ -38,6 +44,17 @@ func drainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func authenticated(r *http.Request) bool {
+	auth := os.Getenv("AUTH_PASSWORD")
+
+	_, password, _ := r.BasicAuth()
+	if auth != "" && auth != password {
+		// AUTH_PASSWORD is set and provided password doesn't match
+		return false
+	}
+	return true
 }
 
 func report(hit *parser.ParsedLogLine) {
