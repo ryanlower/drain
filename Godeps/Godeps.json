@@ -1,5 +1,10 @@
 {
 	"ImportPath": "github.com/ryanlower/drain",
 	"GoVersion": "go1.4",
-	"Deps": []
+	"Deps": [
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "6628c86d6a89ce7983c7c9b5e98c1df795fbd256"
+		}
+	]
 }

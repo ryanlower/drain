@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/ryanlower/drain/parser"
+	"github.com/ryanlower/drain/reporters"
 )
 
 func main() {
@@ -31,7 +32,17 @@ func drainHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	parsed, err := parser.Parse(body)
-	log.Print(parsed)
+
+	if parsed != nil {
+		report(parsed)
+	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+func report(hit *parser.ParsedLogLine) {
+	// use Log and Redis reporters by default
+	// TODO, allow customization
+	new(reporters.Log).Report(hit)
+	new(reporters.Redis).Report(hit)
 }
