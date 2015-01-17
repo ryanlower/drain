@@ -10,19 +10,31 @@ import (
 	"github.com/ryanlower/drain/reporters"
 )
 
-func main() {
-	port := os.Getenv("PORT")
-
-	http.HandleFunc("/drain", drainHandler)
-
-	log.Printf("Listening on port %v ...", port)
-	err := http.ListenAndServe(":"+port, nil)
-	if err != nil {
-		log.Panic(err)
-	}
+// Drain is used to maintain a list of Reporters
+// registered to recieve parsed logs for processing
+type Drain struct {
+	reporters []reporters.Reporter
 }
 
-func drainHandler(w http.ResponseWriter, r *http.Request) {
+// AddReporter adds a reporter of type t
+// to the list of drain reporters
+func (d *Drain) AddReporter(t string) error {
+	reporter, err := reporters.New(t)
+	if err != nil {
+		panic(err)
+	}
+
+	d.reporters = append(d.reporters, reporter)
+
+	return nil
+}
+
+// Handler takes a http.Request,
+// checks authorization via HTTP basic auth (if setup, see authenticated)
+// parses the request into a parser.ParsedLogLine via parser.Parse
+// and sends the ParsedLogLine to registered Reporters
+// If all goes well, writes an OK status to the http.ResponseWriter
+func (d *Drain) Handler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if !authenticated(r) {
@@ -40,12 +52,40 @@ func drainHandler(w http.ResponseWriter, r *http.Request) {
 	parsed, err := parser.Parse(body)
 
 	if parsed != nil {
-		report(parsed)
+		d.report(parsed)
 	}
 
 	w.WriteHeader(http.StatusOK)
 }
 
+func (d *Drain) report(hit *parser.ParsedLogLine) {
+	for _, reporter := range d.reporters {
+		go reporter.Report(hit)
+	}
+}
+
+// Listens for logs at /drain on env PORT
+func main() {
+	port := os.Getenv("PORT")
+
+	drain := new(Drain)
+	// use Log and Redis reporters by default
+	// TODO, allow customization
+	drain.AddReporter("log")
+	drain.AddReporter("redis")
+
+	http.HandleFunc("/drain", drain.Handler)
+
+	log.Printf("Listening on port %v ...", port)
+	err := http.ListenAndServe(":"+port, nil)
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+// Helper HTTP basic auth function
+// Returns false if AUTH_PASSWORD env is set and provided password doesn't match
+// true otherwise
 func authenticated(r *http.Request) bool {
 	auth := os.Getenv("AUTH_PASSWORD")
 
@@ -55,11 +95,4 @@ func authenticated(r *http.Request) bool {
 		return false
 	}
 	return true
-}
-
-func report(hit *parser.ParsedLogLine) {
-	// use Log and Redis reporters by default
-	// TODO, allow customization
-	new(reporters.Log).Report(hit)
-	new(reporters.Redis).Report(hit)
 }

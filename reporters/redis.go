@@ -16,23 +16,27 @@ import (
 // using that password on connection
 type Redis struct {
 	Reporter
+	connection redis.Conn
+}
+
+func (r *Redis) init() {
+	r.connect()
 }
 
 // Report publishes the parsed log lines status code to redis
 func (r *Redis) Report(hit *parser.ParsedLogLine) {
-	conn := connect()
-
 	hitJSON, err := json.Marshal(hit)
 	if err != nil {
 		log.Panic(err)
 	} else {
-		conn.Do("PUBLISH", "drain.hits", hitJSON)
+		r.connection.Do("PUBLISH", "drain.hits", hitJSON)
 	}
 }
 
-func connect() redis.Conn {
+func (r *Redis) connect() {
 	address := envOrDefault("REDIS_ADDRESS", "localhost:6379")
 	conn, err := redis.Dial("tcp", address)
+
 	// TODO, how to handle errors in reporters?
 	if err != nil {
 		log.Panic(err)
@@ -43,5 +47,5 @@ func connect() redis.Conn {
 		conn.Do("AUTH", password)
 	}
 
-	return conn
+	r.connection = conn
 }
