@@ -2,6 +2,8 @@
 
 A log drain for Heroku's [Logplex](https://devcenter.heroku.com/articles/logplex). Parses requests and pushes them to redis.
 
+[![Circle CI](https://circleci.com/gh/ryanlower/drain.svg?style=svg)](https://circleci.com/gh/ryanlower/drain)
+
 ---
 
 ### Usage
