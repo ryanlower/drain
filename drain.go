@@ -73,6 +73,7 @@ func main() {
 	// TODO, allow customization
 	drain.AddReporter("log")
 	drain.AddReporter("redis")
+	drain.AddReporter("librato")
 
 	http.HandleFunc("/drain", drain.Handler)
 

@@ -23,6 +23,8 @@ func New(t string) (Reporter, error) {
 		reporter = new(Log)
 	case "redis":
 		reporter = new(Redis)
+	case "librato":
+		reporter = new(Librato)
 	default:
 		return nil, errors.New("Unknown reporter type: " + t)
 	}
