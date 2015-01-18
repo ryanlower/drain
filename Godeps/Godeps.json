@@ -5,6 +5,10 @@
 		{
 			"ImportPath": "github.com/garyburd/redigo/redis",
 			"Rev": "6628c86d6a89ce7983c7c9b5e98c1df795fbd256"
+		},
+		{
+			"ImportPath": "github.com/rcrowley/go-librato",
+			"Rev": "a17ea15e933f52d83d7d38ac16153fe33e34f1f0"
 		}
 	]
 }
